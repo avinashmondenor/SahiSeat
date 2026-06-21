@@ -604,7 +604,7 @@ function Results({ result, query }) {
 function PredictForm({ onResult, hasResult, query }) {
   const [rank, setRank] = useState('')
   const [category, setCategory] = useState('')
-  const [gender, setGender] = useState('')
+  const [gender, setGender] = useState('Gender-Neutral')
   const [state, setState] = useState('')
   const [preferredBranches, setPreferredBranches] = useState([])
   const [loading, setLoading] = useState(false)
@@ -679,18 +679,21 @@ function PredictForm({ onResult, hasResult, query }) {
             <CardContent className="relative p-5 md:p-8">
               <form onSubmit={onSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <div className="md:col-span-2">
-                  <Label htmlFor="rank" className="mb-1.5 block text-xs uppercase tracking-wider text-muted-foreground">
-                    CRL / Category Rank
+                  <Label htmlFor="rank" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    JEE Main CRL Rank
                   </Label>
                   <Input
                     id="rank"
                     inputMode="numeric"
                     pattern="[0-9]*"
-                    placeholder="e.g. 24500"
+                    placeholder="e.g. 15000"
                     value={rank}
                     onChange={(e) => setRank(e.target.value.replace(/[^0-9]/g, ''))}
                     className="h-11 rounded-xl border-white/10 bg-black/30 px-4 text-sm sm:text-base placeholder:text-muted-foreground/60 focus-visible:ring-violet-500/40"
                   />
+                  <p className="mt-1.5 text-[11px] text-muted-foreground/70">
+                    Enter your Common Rank List (CRL) rank from JEE Main.
+                  </p>
                 </div>
 
                 <div>
