@@ -187,8 +187,22 @@ export async function POST(request) {
     });
 
     // Feature 1: Home State NIT Opportunities (top 10 branches in user's home state NIT)
+    // Deduplicate by institute+program, keeping the earliest round for each unique pair.
     const hsNitList = filtered.filter(item => item.instituteType === "NIT" && getNitState(item.institute) === homeState);
-    const homeStateNitOpportunities = hsNitList.slice(0, 10);
+    // Sort by round ascending so earliest round appears first during dedup
+    const hsNitSortedByRound = [...hsNitList].sort((a, b) => (a.round || 0) - (b.round || 0));
+    const hsSeenKeys = new Set();
+    const hsNitDeduped = [];
+    for (const item of hsNitSortedByRound) {
+      const key = `${item.institute}|${item.program}`;
+      if (!hsSeenKeys.has(key)) {
+        hsSeenKeys.add(key);
+        hsNitDeduped.push(item);
+      }
+    }
+    // Re-sort deduped list by rankGap ascending for best-first display
+    hsNitDeduped.sort((a, b) => a.rankGap - b.rankGap);
+    const homeStateNitOpportunities = hsNitDeduped.slice(0, 10);
 
     // Feature 3: Recommendation Buckets (max 50 total results)
     const bestMatches = filtered.slice(0, 10);
