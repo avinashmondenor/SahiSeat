@@ -61,38 +61,123 @@ const STATES = [
 ]
 
 function Nav({ hasResult, onReset }) {
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  const scrollTo = (id) => {
+    setMobileOpen(false)
+    const el = document.getElementById(id)
+    if (el) el.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  const NAV_LINKS = [
+    { label: 'Predictor', id: 'predict' },
+    { label: 'Features', id: 'features' },
+    { label: 'How It Works', id: 'how' },
+    { label: 'FAQ', id: 'faq' },
+    { label: 'About', id: 'about' },
+  ]
+
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-background/60 border-b border-white/5">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <a href="#" className="flex items-center gap-2">
+        {/* Logo */}
+        <button onClick={() => scrollTo('predict')} className="flex items-center gap-2 focus:outline-none">
           <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 shadow-lg shadow-violet-500/30">
             <GraduationCap className="h-4 w-4 text-white" />
           </div>
           <span className="text-base font-semibold tracking-tight">
             Sahi<span className="text-violet-400">Seat</span>
           </span>
-        </a>
-        <nav className="hidden md:flex items-center gap-7 text-sm text-muted-foreground">
-          <a href="#predict" className="hover:text-foreground transition">Predictor</a>
-          <a href="#features" className="hover:text-foreground transition">Features</a>
-          <a href="#how" className="hover:text-foreground transition">How it works</a>
-          <a href="#faq" className="hover:text-foreground transition">FAQ</a>
+        </button>
+
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
+          {NAV_LINKS.map(({ label, id }) => (
+            <button
+              key={id}
+              onClick={() => scrollTo(id)}
+              className="hover:text-foreground transition focus:outline-none"
+            >
+              {label}
+            </button>
+          ))}
         </nav>
-        {hasResult ? (
-          <Button
-            size="sm"
-            onClick={onReset}
-            className="rounded-full bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-600/20"
+
+        {/* Desktop CTA */}
+        <div className="hidden md:block">
+          {hasResult ? (
+            <Button
+              size="sm"
+              onClick={onReset}
+              className="rounded-full bg-violet-600 text-white hover:bg-violet-500 shadow-lg shadow-violet-600/20"
+            >
+              New Prediction
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              onClick={() => scrollTo('predict')}
+              className="rounded-full bg-white text-black hover:bg-white/90"
+            >
+              Get Started
+              <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+            </Button>
+          )}
+        </div>
+
+        {/* Mobile: hamburger + CTA row */}
+        <div className="flex md:hidden items-center gap-2">
+          {hasResult && (
+            <Button
+              size="sm"
+              onClick={onReset}
+              className="rounded-full bg-violet-600 text-white hover:bg-violet-500 text-xs px-3 h-8"
+            >
+              New Prediction
+            </Button>
+          )}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-white/70 hover:text-white transition focus:outline-none"
+            aria-label="Toggle menu"
           >
-            New Prediction
-          </Button>
-        ) : (
-          <Button size="sm" className="rounded-full bg-white text-black hover:bg-white/90">
-            Get started
-            <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-          </Button>
-        )}
+            {mobileOpen ? (
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
+
+      {/* Mobile dropdown */}
+      {mobileOpen && (
+        <div className="md:hidden border-t border-white/5 bg-background/95 backdrop-blur-xl">
+          <nav className="flex flex-col px-4 py-3 gap-0.5">
+            {NAV_LINKS.map(({ label, id }) => (
+              <button
+                key={id}
+                onClick={() => scrollTo(id)}
+                className="w-full text-left px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-white/[0.04] transition focus:outline-none"
+              >
+                {label}
+              </button>
+            ))}
+            {!hasResult && (
+              <button
+                onClick={() => scrollTo('predict')}
+                className="mt-2 w-full rounded-xl bg-white text-black text-sm font-medium py-2.5 hover:bg-white/90 transition"
+              >
+                Get Started
+              </button>
+            )}
+          </nav>
+        </div>
+      )}
     </header>
   )
 }
@@ -138,14 +223,18 @@ function Hero() {
             actually have a shot at — based purely on historical closing-rank data.
           </p>
 
-          <div className="mt-4 flex items-center gap-3 hidden md:flex">
-            <a href="#predict">
+          <div className="mt-4 hidden md:flex items-center gap-3">
+            <button
+              onClick={() => document.getElementById('predict')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               <Button size="sm" className="rounded-full bg-white text-black hover:bg-white/90">
                 Predict my colleges
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-            </a>
-            <a href="#how">
+            </button>
+            <button
+              onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               <Button
                 size="sm"
                 variant="outline"
@@ -153,7 +242,7 @@ function Hero() {
               >
                 How it works
               </Button>
-            </a>
+            </button>
           </div>
         </div>
       </div>
@@ -742,46 +831,57 @@ function PredictForm({ onResult, hasResult, query }) {
 }
 
 function Features() {
-  const items = [
-    {
-      icon: TrendingUp,
-      title: 'Historical cutoff data',
-      desc: 'Every match is grounded in official CSAB opening & closing ranks — no guesswork.',
-    },
-    {
-      icon: Target,
-      title: 'Smallest-gap matching',
-      desc: 'Results are ranked by how tightly your rank fits the closing rank.',
-    },
-    {
-      icon: ShieldCheck,
-      title: 'No fluff. No AI noise.',
-      desc: 'Pure deterministic filtering — same query gives same results, every time.',
-    },
+  const live = [
+    { emoji: '🎯', title: 'Rank-Based Prediction', desc: 'Find colleges and branches based on your JEE Main rank.' },
+    { emoji: '🏠', title: 'Home State Advantage', desc: 'Discover opportunities available through your home state quota.' },
+    { emoji: '📊', title: 'Smart Recommendations', desc: 'Results grouped into Best Matches, Good Options and Explore More.' },
+    { emoji: '⚡', title: 'Instant Results', desc: 'No signup required. Get recommendations instantly.' },
+  ]
+  const coming = [
+    { emoji: '📋', title: 'Personalized Choice List Generator' },
+    { emoji: '⚖️', title: 'College Comparison Tool' },
+    { emoji: '🧠', title: 'CSAB Strategy Assistant' },
+    { emoji: '💾', title: 'Save & Track Choices' },
   ]
   return (
-    <section id="features" className="py-6 md:py-10">
+    <section id="features" className="py-10 md:py-16">
       <div className="container mx-auto px-4">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
-            Built for the special round.
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Stop guessing your CSAB choices. Start optimising them.
-          </p>
+        <div className="mx-auto max-w-2xl text-center mb-10">
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">Features</h2>
         </div>
-        <div className="mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-4 md:grid-cols-3">
-          {items.map(({ icon: Icon, title, desc }) => (
-            <Card key={title} className="group relative overflow-hidden border-white/10 bg-white/[0.02] transition hover:bg-white/[0.04]">
-              <CardContent className="p-6">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500/20 to-fuchsia-500/20 ring-1 ring-white/10">
-                  <Icon className="h-5 w-5 text-violet-300" />
-                </div>
-                <h3 className="mt-4 text-base font-medium">{title}</h3>
-                <p className="mt-1.5 text-sm text-muted-foreground">{desc}</p>
-              </CardContent>
-            </Card>
+
+        {/* Live features */}
+        <div className="mx-auto max-w-5xl grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {live.map(({ emoji, title, desc }) => (
+            <div
+              key={title}
+              className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 hover:bg-white/[0.04] transition"
+            >
+              <div className="text-2xl mb-3">{emoji}</div>
+              <h3 className="text-sm font-semibold text-white mb-1.5">{title}</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">{desc}</p>
+            </div>
           ))}
+        </div>
+
+        {/* Coming Soon */}
+        <div className="mx-auto max-w-5xl mt-8">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-sm font-semibold text-white/60">Coming Soon</span>
+            <span className="text-base">🚀</span>
+            <div className="flex-1 h-px bg-white/5" />
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {coming.map(({ emoji, title }) => (
+              <div
+                key={title}
+                className="rounded-xl border border-white/[0.06] bg-white/[0.01] p-4 flex items-center gap-3 opacity-60"
+              >
+                <span className="text-xl shrink-0">{emoji}</span>
+                <span className="text-xs font-medium text-white/50">{title}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -790,24 +890,23 @@ function Features() {
 
 function HowItWorks() {
   const steps = [
-    { n: '01', t: 'Enter your details', d: 'CRL/category rank, category, gender, home state.' },
-    { n: '02', t: 'We filter & sort', d: 'Closing Rank ≥ your rank, then ascending by (Closing − Your rank).' },
-    { n: '03', t: 'Get your shortlist', d: 'Top 5 Best Matches + up to 40 eligible records.' },
+    { n: '01', t: 'Enter your rank and preferences.', d: 'Provide your JEE rank, category, gender, home state and preferred branches.' },
+    { n: '02', t: 'SahiSeat analyzes the data.', d: 'We match your inputs against historical JoSAA and CSAB cutoff records.' },
+    { n: '03', t: 'Get personalized recommendations.', d: 'Receive college and branch suggestions ranked by how closely they fit your rank.' },
+    { n: '04', t: 'Build a smarter strategy.', d: 'Explore options and build a smarter counseling strategy before filling choices.' },
   ]
   return (
-    <section id="how" className="py-6 md:py-10">
+    <section id="how" className="py-10 md:py-16">
       <div className="container mx-auto px-4">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
-            How SahiSeat works
-          </h2>
+        <div className="mx-auto max-w-2xl text-center mb-10">
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">How It Works</h2>
         </div>
-        <div className="mx-auto mt-10 grid max-w-5xl grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="mx-auto max-w-5xl grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((s) => (
-            <div key={s.n} className="relative rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-6">
-              <div className="text-xs font-medium tracking-widest text-violet-300">{s.n}</div>
-              <div className="mt-2 text-lg font-medium">{s.t}</div>
-              <p className="mt-1.5 text-sm text-muted-foreground">{s.d}</p>
+            <div key={s.n} className="relative rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-5">
+              <div className="text-xs font-bold tracking-widest text-violet-400 mb-2">Step {s.n}</div>
+              <div className="text-sm font-semibold text-white mb-1.5">{s.t}</div>
+              <p className="text-xs text-muted-foreground leading-relaxed">{s.d}</p>
             </div>
           ))}
         </div>
@@ -816,9 +915,112 @@ function HowItWorks() {
   )
 }
 
+function FAQ() {
+  const [openIdx, setOpenIdx] = useState(null)
+  const items = [
+    {
+      q: 'Is SahiSeat official?',
+      a: 'No. SahiSeat is an independent guidance tool and is not affiliated with NTA, JoSAA or CSAB.',
+    },
+    {
+      q: 'Does SahiSeat guarantee admission?',
+      a: 'No. Recommendations are based on historical cutoff trends and should be used as a guide, not a guarantee.',
+    },
+    {
+      q: 'Is the data based on JoSAA and CSAB cutoffs?',
+      a: 'Yes. All predictions use official JoSAA and CSAB published closing rank data from previous rounds.',
+    },
+    {
+      q: 'Do I need to create an account?',
+      a: 'No. SahiSeat requires no registration. Just enter your details and get results instantly.',
+    },
+    {
+      q: 'Is SahiSeat free?',
+      a: 'Yes. SahiSeat is completely free to use.',
+    },
+  ]
+  return (
+    <section id="faq" className="py-10 md:py-16">
+      <div className="container mx-auto px-4">
+        <div className="mx-auto max-w-2xl text-center mb-10">
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">Frequently Asked Questions</h2>
+        </div>
+        <div className="mx-auto max-w-2xl space-y-2">
+          {items.map(({ q, a }, i) => (
+            <div
+              key={i}
+              className="rounded-xl border border-white/10 bg-white/[0.02] overflow-hidden"
+            >
+              <button
+                onClick={() => setOpenIdx(openIdx === i ? null : i)}
+                className="w-full flex items-center justify-between px-5 py-4 text-left text-sm font-medium text-white hover:bg-white/[0.03] transition focus:outline-none"
+              >
+                <span>{q}</span>
+                <ChevronDown
+                  className={`h-4 w-4 shrink-0 text-white/40 transition-transform duration-200 ${
+                    openIdx === i ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+              {openIdx === i && (
+                <div className="px-5 pb-4 text-sm text-muted-foreground border-t border-white/5 pt-3">
+                  {a}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function About() {
+  return (
+    <section id="about" className="py-10 md:py-16">
+      <div className="container mx-auto px-4">
+        <div className="mx-auto max-w-xl">
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-4">About SahiSeat</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+            SahiSeat helps JEE aspirants make smarter JoSAA and CSAB counseling decisions using
+            historical cutoff data and transparent recommendations. No guesswork. No black boxes.
+          </p>
+          <p className="text-sm text-white/70 mb-6">
+            Built by <span className="text-violet-300 font-semibold">Vijayendra Ch</span> · IIIT Vadodara
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href="https://www.linkedin.com/in/ch-vijayendraswamy/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.07] hover:border-white/20 transition"
+            >
+              <svg className="h-4 w-4 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+              </svg>
+              LinkedIn
+            </a>
+            <a
+              href="https://www.youtube.com/@SahiSeat"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-sm text-white/70 hover:text-white hover:bg-white/[0.07] hover:border-white/20 transition"
+            >
+              <svg className="h-4 w-4 text-red-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+              </svg>
+              YouTube
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 function Footer() {
   return (
-    <footer id="faq" className="border-t border-white/5 py-10">
+    <footer className="border-t border-white/5 py-10">
       <div className="container mx-auto flex flex-col items-center justify-between gap-4 px-4 md:flex-row">
         <div className="flex items-center gap-2">
           <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500">
@@ -862,6 +1064,8 @@ const App = () => {
       {result && query && <Results result={result} query={query} />}
       <Features />
       <HowItWorks />
+      <FAQ />
+      <About />
       <Footer />
     </main>
   )
