@@ -87,6 +87,12 @@ export async function POST(request) {
     // Load CSV data dynamically (ensures fresh load if files changed)
     const records = loadAllCsvRecords();
 
+    console.log("Total records loaded:", records.length);
+    console.log(
+      "Files loaded:",
+      [...new Set(records.map((r) => r.sourceFile))]
+    );
+
     // Eligibility Rules:
     // 1. Seat Type matches selected category
     // 2. Gender matches selected gender
@@ -94,7 +100,7 @@ export async function POST(request) {
     // 4. Home State (HS) Quota rule:
     //    For NITs, if quota is "Home State", it is only eligible if user's Home State matches NIT's state.
     const filtered = [];
-    
+
     // Diagnostic counts for eligible records (before sorting/limiting)
     let eligibleNitCount = 0;
     let eligibleIiitCount = 0;
@@ -117,8 +123,8 @@ export async function POST(request) {
       const isPlan = courseName.includes("planning") || courseName.includes("bplan") || courseName.includes("b.plan");
       const isSpa = instituteName.includes("school of planning") || instituteName.includes("spa") || instituteName.includes("planning and architecture");
       const isDasa = quotaLower.includes("dasa") || quotaLower.includes("foreign") || quotaLower.includes("nri") || quotaLower.includes("oci") || quotaLower.includes("pio") ||
-                     seatTypeLower.includes("dasa") || seatTypeLower.includes("foreign") || seatTypeLower.includes("nri") || seatTypeLower.includes("oci") || seatTypeLower.includes("pio") ||
-                     courseName.includes("dasa") || courseName.includes("nri") || courseName.includes("foreign");
+        seatTypeLower.includes("dasa") || seatTypeLower.includes("foreign") || seatTypeLower.includes("nri") || seatTypeLower.includes("oci") || seatTypeLower.includes("pio") ||
+        courseName.includes("dasa") || courseName.includes("nri") || courseName.includes("foreign");
 
       return !isArch && !isPlan && !isSpa && !isDasa;
     };
