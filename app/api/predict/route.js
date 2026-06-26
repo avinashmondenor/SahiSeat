@@ -19,33 +19,51 @@ export const dynamic = "force-dynamic";
 
 function getRecordBranch(programName) {
   const name = (programName || "").toLowerCase().trim();
-  if (name.includes("computer science") || name.includes("computer engineering") || name.includes("cse")) {
+
+  // CSE
+  if (
+    name.includes("computer science") ||
+    name.includes("computer engineering") ||
+    name.includes("cse")
+  ) {
     return "CSE";
   }
-  if (name.includes("artificial intelligence") || name.includes("ai") || name.includes("machine learning")) {
+
+  // AI
+  if (
+    name.includes("artificial intelligence") ||
+    name.includes("machine learning") ||
+    name.includes("artificial intelligence and data science") ||
+    name.includes("data science and artificial intelligence") ||
+    name.includes("computer science and artificial intelligence") ||
+    name.includes("artificial intelligence and machine learning") ||
+    name.includes("artificial intelligence & machine learning") ||
+    name.includes("robotics and ai") ||
+    name.includes("aiml")
+  ) {
     return "AI";
   }
-  if (name.includes("information technology") || name.includes("it")) {
+
+  // IT
+  if (
+    name.includes("information technology")
+  ) {
     return "IT";
   }
-  if (name.includes("electronics and communication") || name.includes("ece") || name.includes("electronics & communication") || name.includes("telecommunication")) {
+
+  // ECE
+  if (
+    name.includes("electronics and communication") ||
+    name.includes("electronics & communication") ||
+    name.includes("electronics and telecommunication") ||
+    name.includes("electronics & telecommunication") ||
+    name.includes("telecommunication engineering") ||
+    name.includes("ece")
+  ) {
     return "ECE";
   }
-  if (name.includes("electrical") || name.includes("ee")) {
-    return "EE";
-  }
-  if (name.includes("mechanical")) {
-    return "Mechanical";
-  }
-  if (name.includes("civil")) {
-    return "Civil";
-  }
-  if (name.includes("chemical")) {
-    return "Chemical";
-  }
-  if (name.includes("biotechnol") || name.includes("bio-technology") || name.includes("bt")) {
-    return "Biotechnology";
-  }
+
+  // Every other branch
   return "Other";
 }
 
@@ -179,23 +197,32 @@ export async function POST(request) {
       else eligibleOtherCount++;
 
       const recordBranch = getRecordBranch(r.program);
-      const matchesPref = preferredBranches.includes(recordBranch) || (preferredBranches.includes("Other") && recordBranch === "Other");
 
-      filtered.push({
-        institute: r.institute,
-        program: r.program,
-        quota: r.quota,
-        seatType: r.seatType,
-        gender: r.gender,
-        openingRank: r.openingRank,
-        closingRank: r.closingRank,
-        round: r.round,
-        sourceFile: r.sourceFile,
-        rankGap: r.closingRank - rank,
-        instituteType: type,
-        branch: recordBranch,
-        matchesPreferred: matchesPref,
-      });
+// STRICT BRANCH FILTERING
+if (
+  preferredBranches.length > 0 &&
+  !preferredBranches.includes(recordBranch)
+) {
+  continue;
+}
+
+const matchesPref = true;
+
+filtered.push({
+  institute: r.institute,
+  program: r.program,
+  quota: r.quota,
+  seatType: r.seatType,
+  gender: r.gender,
+  openingRank: r.openingRank,
+  closingRank: r.closingRank,
+  round: r.round,
+  sourceFile: r.sourceFile,
+  rankGap: r.closingRank - rank,
+  instituteType: type,
+  branch: recordBranch,
+  matchesPreferred: matchesPref,
+});
     }
 
     // Sort by:
